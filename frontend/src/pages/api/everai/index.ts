@@ -28,11 +28,10 @@ const token_id = req.body.tokenId as number
   
   // after passing herodotus validation, we can get proof from ethereum it. Why? we need this for get_storage_uint for factregistery
   const output = await formatingProof(contract_data.address, proofOwnership?.slot, proofOwnership?.blockNum)
+  console.log(output)
+  const result = {proof: output, block_number: proofOwnership?.blockNum, slot: proofOwnership?.slot, contract : contract_data.address}
 
-  const calldata = [token_id,proofOwnership?.blockNum,address, output.slot, output.proof_sizes_bytes, output.proof_sizes_words, output.proofs_concat  ]
-  
-  console.log(calldata)
-  const result = {calldata, block_number: proofOwnership?.blockNum}
+  console.log(result)
   return res.status(200).json(result)
 }
 

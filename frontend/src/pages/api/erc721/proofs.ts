@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import { ethGetProof, ethGetStorageAt, getCurrentBlockNum } from './quicknode'
 import { Data } from "../utils/data"
 import { BigNumber } from "ethers"
+import * as RLP from "rlp";
 
 export const proofOfOwnership = async (address:string, token_id: number, contract_address: string, block_number: number, mapping_storage_slot: number) => {
   
@@ -61,39 +62,8 @@ export const herodotusProof = async (address: string, blockNum: number) => {
 export const formatingProof = async (address: string, slot: string, blockNum: number) => {
   const ethProof = await ethGetProof(address, [slot], blockNum)
   const rawProof = ethProof.storageProof[0].proof;
-  const proof = rawProof.map((leaf: any) => Data.fromHex(leaf).toInts());
- 
-  const flatProofByteLengths: number[] = [];
-  const flatProofWordLengths: number[] = [];
-  let flatProofValues: BigNumber[] = [];
-
-  for (const element of proof) {
-    flatProofByteLengths.push(element.sizeBytes);
-    flatProofWordLengths.push(element.values.length);
-    flatProofValues = flatProofValues.concat(element.values);
-  }
-
-  const slot_from_hex = Data.fromHex(slot)
-    .toInts()
-    .values.map((value: any) => value.toHexString())
-  console.log(rawProof,slot,proof)
-  // const calldata = [
-  //   BigNumber.from(blockNum).toHexString(),
-  //   address,
-  //   ...slot_from_hex,
-  //   BigNumber.from(flatProofByteLengths.length).toHexString(),
-  //   ...flatProofByteLengths.map((length) => "0x" + length.toString(16)),
-  //   BigNumber.from(flatProofWordLengths.length).toHexString(),
-  //   ...flatProofWordLengths.map((length) => "0x" + length.toString(16)),
-  //   BigNumber.from(flatProofValues.length).toHexString(),
-  //   ...flatProofValues.map((value) => value.toHexString()),
-  // ]
-
- 
-
-  const output = {
-    slot :slot_from_hex, proof_sizes_bytes : flatProofByteLengths.map((length) => "0x" + length.toString(16)), proof_sizes_words: flatProofWordLengths.map((length) => "0x" + length.toString(16)), proofs_concat: flatProofValues.map((value) => value.toHexString()),
-  }
-
-  return output
+  const proof = "0x"+ Array.from(RLP.encode(rawProof.map((part:any) => RLP.decode(part)))).map((b:any) => b.toString(16).padStart(2, "0")).join("");
+  // console.log(RLP.encode(rawProof.map((part:any) => RLP.decode(part))))
+  // const proof =  "0x" + RLP.encode(rawProof.proofLeaves.map((part:any) => RLP.decode(part))).toString(16);
+  return proof
 }

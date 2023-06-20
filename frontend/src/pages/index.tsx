@@ -15,38 +15,52 @@ import {
 } from "wagmi";
 
 import { useEffect, useMemo, useState } from "react";
-import { accessProof, handleGenerateProof } from "@/shared/axios";
+import {
+  accessProof,
+  accountStorageHash,
+  handleGenerateProof,
+} from "@/shared/axios";
 import { recoverPublicKey } from "viem";
 import { factRegistryAbi } from "@/shared/factRegistryAbi";
+import { stringify } from "querystring";
 
 const inter = Inter({ subsets: ["latin"] });
-
-type selectedTokenProveType = {
-  block_number: number;
-  calldata: any[];
-  metadata: string;
+let contract_data = {
+  address: "0xB6920Bc97984b454A2A76fE1Be5e099f461Ed9c8",
+  mapping_storage_slot: 5,
+  proof_blocknumber: 0,
 };
 
 export default function Home() {
   const { address, isConnected } = useAccount();
+  const [result, setResult] = useState("");
 
   const clickGenerateProof = async () => {
-    await handleGenerateProof(address as string, 1);
+    //generate proof of token number 16
+    await handleGenerateProof(address as string, 16);
     console.log("clickGenerateProof");
   };
 
   const clickVerifyProof = async () => {
-    const proof: any = localStorage.getItem("proof");
-    console.log("clickVerifyProof");
-    await accessProof(
-      "0x2eBAf969571f3814a230850FcCACCC82A932FB6E" as string,
-      factRegistryAbi,
-      "proveStorage",
+    const item: any = localStorage.getItem("proofs");
+    const data = JSON.parse(item as string);
+    console.log(data);
+    console.log(
       address as string,
-      proof[0].block_number,
-      proof[0].calldata[3],
-      proof[0].calldata[4]
+      data[16][1].block_number,
+      data[16][1].slot,
+      data[16][1].proof
     );
+
+    // check the proof
+    const res: any = await accessProof(
+      contract_data.address,
+      data[16][1].block_number,
+      data[16][1].slot,
+      data[16][1].proof
+    );
+    setResult(res);
+    console.log(result, "result");
   };
   return (
     <>
@@ -57,17 +71,22 @@ export default function Home() {
           <ConnectButton />
         </div>
       </div>
-      {isConnected && (
-        <div className={styles.proofbutton} onClick={clickGenerateProof}>
-          Generate Proof
-        </div>
-      )}
+      <div>
+        {isConnected && (
+          <div className={styles.proofbutton} onClick={clickGenerateProof}>
+            Generate Proof of Latest Block for NFT #16 Ownership
+          </div>
+        )}
+      </div>
       <br />
-      {isConnected && (
-        <div className={styles.proofbutton} onClick={clickVerifyProof}>
-          Verify Proof
-        </div>
-      )}
+      <div>
+        {isConnected && (
+          <div className={styles.proofbutton} onClick={clickVerifyProof}>
+            Verify Proof
+          </div>
+        )}
+      </div>
+      <div>{result !== "" && <div>{result}</div>}</div>
     </>
   );
 }
