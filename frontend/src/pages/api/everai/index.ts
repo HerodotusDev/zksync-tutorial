@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { herodotusProof, proofOfOwnership, starknetVerify } from '../erc721/proofs'
+import { herodotusProof, proofOfOwnership, formatingProof } from '../erc721/proofs'
 import { getCurrentBlockNum } from '../erc721/quicknode'
 import { getTokenIds } from '../erc721/alchemy'
 type ReturnData = {
@@ -26,8 +26,8 @@ const token_id = req.body.tokenId as number
   //generate check user's proof and validate it send it to factregistery
   await herodotusProof(contract_data.address, proofOwnership?.blockNum )
   
-  // after passing herodotus validation, we can get proof from ethereum and starknetverify it. Why? we need this for get_storage_uint for factregistery
-  const output = await starknetVerify(contract_data.address, proofOwnership?.slot, proofOwnership?.blockNum)
+  // after passing herodotus validation, we can get proof from ethereum it. Why? we need this for get_storage_uint for factregistery
+  const output = await formatingProof(contract_data.address, proofOwnership?.slot, proofOwnership?.blockNum)
 
   const calldata = [token_id,proofOwnership?.blockNum,address, output.slot, output.proof_sizes_bytes, output.proof_sizes_words, output.proofs_concat  ]
   

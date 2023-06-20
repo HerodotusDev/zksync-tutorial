@@ -34,7 +34,7 @@ export const herodotusProof = async (address: string, blockNum: number) => {
   const herodotus_api_key = process.env.HERODOTUS_API_KEY as string
   const body = {
     originChain: "GOERLI",
-    destinationChain: "STARKNET_GOERLI",
+    destinationChain: "ZKSYNC_GOERLI",
     blockNumber: blockNum,
     type: "ACCOUNT_ACCESS",
     requestedProperties: {
@@ -58,7 +58,7 @@ export const herodotusProof = async (address: string, blockNum: number) => {
   return data;
 }
 
-export const starknetVerify = async (address: string, slot: string, blockNum: number) => {
+export const formatingProof = async (address: string, slot: string, blockNum: number) => {
   const ethProof = await ethGetProof(address, [slot], blockNum)
   const rawProof = ethProof.storageProof[0].proof;
   const proof = rawProof.map((leaf: any) => Data.fromHex(leaf).toInts());
@@ -76,7 +76,7 @@ export const starknetVerify = async (address: string, slot: string, blockNum: nu
   const slot_from_hex = Data.fromHex(slot)
     .toInts()
     .values.map((value: any) => value.toHexString())
-  console.log(slot_from_hex)
+  console.log(rawProof,slot,proof)
   // const calldata = [
   //   BigNumber.from(blockNum).toHexString(),
   //   address,

@@ -21,10 +21,6 @@ const { wallets } = getDefaultWallets({
   projectId: "rainbowkit-mint-nft-demo",
 });
 
-const demoAppInfo = {
-  appName: "RainbowKit Mint NFT Demo",
-};
-
 const connectors = connectorsForWallets([...wallets]);
 
 const wagmiClient = createClient({
