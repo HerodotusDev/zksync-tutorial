@@ -6,6 +6,8 @@
 
 This tutorial project demonstrates how zkSync users can prove ownership of an NFT they hold on Ethereum Goerli using storage proofs. The Herodotus API is used to generate the needed storage proofs.
 
+- In this example project will make a everai nft #16's proof of ownership at latest block in Goerli and verify it on zkSync
+
 ## Why Storage Proofs?
 
 Storage proofs are cryptographic proofs that demonstrate the integrity and availability of specific blockchain data. For example, a storage proof can be used to prove ownership of an ERC-721A NFT on the Goerli Blockchain in a specific block.
